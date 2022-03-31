@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="controlPanel">
+        <button id="start">Start</button>
+        <button id="clear">Clear</button>
+        <label for="checkbox">Construction mode</label>
+        <input type="checkbox" id="checkbox"/>
+        <button id="chooseBuild">Choose Build</button>
+        <span id="currentBuild">GLIDER_RU</span>
+    </div>
+    <div class="canvasWrap">
+        <canvas id="root"></canvas>
+    </div>
+    <div id="builds" class="d-none">
+        <button id="close">Close</button>
+        <div id="buildElements"></div>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
