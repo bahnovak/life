@@ -286,142 +286,85 @@ class Game {
 }
 
 const constants = {
-  GLIDER_RU: 'GLIDER_RU',
-  GLIDER_LU: 'GLIDER_LU',
-  GLIDER_RD: 'GLIDER_RD',
-  GLIDER_LD: 'GLIDER_LD',
-  Hivenudger: 'Hivenudger',
+  GLIDER_RU: {
+    name: 'Glider Right Up',
+    shema: [
+      [0, 0],
+      [1, 0], [1, 1],
+      [2, 1], [2, -1],
+    ]
+  } ,
+  GLIDER_LU: {
+    name: 'Glider Left Up',
+    shema: [
+      [0, 0], [0, 1], [0, 2],
+      [1, 0],
+      [2, 1]
+    ]
+  },
+  GLIDER_RD: {
+    name: 'Glider Right Down',
+    shema: [
+      [0, 0], [0, 2],
+      [1, 1], [1, 2],
+      [2, 1],
+    ]
+  },
+  GLIDER_LD: {
+    name: 'Glider Left Down',
+    shema: [
+      [0, 2],
+      [1, 0], [1, 1],
+      [2, 1], [2, 2],
+    ]
+  },
+  Hivenudger: {
+    name: 'Hivenudger',
+    shema: [
+      [0, 0], [0, 1], [0, 2], [0, 3], [0, 9], [0, 12],
+      [1, 0], [1, 4], [1, 8],
+      [2, 0], [2, 8], [2, 12],
+      [3, 1], [3, 4], [3, 8], [3, 9], [3, 10], [3, 11],
+      [5, 5], [5, 6],
+      [6, 5], [6, 6],
+      [7, 5], [7, 6],
+      [9, 1], [9, 4], [9, 8], [9, 9], [9, 10], [9, 11],
+      [10, 0], [10, 8], [10, 12],
+      [11, 0], [11, 4], [11, 8],
+      [12, 0], [12, 1], [12, 2], [12, 3], [12, 9], [12, 12],
+    ]
+  },
 }
 
 class Builder {
   constructor(matrix) {
     this.matrix = matrix;
-    this.build = constants.GLIDER_RU;
+    this.name = constants.GLIDER_RU.name;
   }
 
   updateMatrix = (matrix) => {
     this.matrix = matrix;
   }
 
-  buildGliderRU = (coords) => {
-    const coordsBuild = [
-      {y: coords.y, x: coords.x},
-      {y: coords.y + 1, x: coords.x},
-      {y: coords.y + 1, x: coords.x + 1},
-      {y: coords.y + 2, x: coords.x + 1},
-      {y: coords.y + 2, x: coords.x - 1},
-    ];
-    coordsBuild.forEach(el => {
-      this.matrix[el.y][el.x] = true;
+  build = (coords, shema) => {
+    shema.forEach(el => {
+      this.matrix[el[0] + coords.y][el[1] + coords.x] = true;
     });
-    return coordsBuild;
-  }
-
-  buildGliderLU = (coords) => {
-    const coordsBuild = [
-      {y: coords.y, x: coords.x},
-      {y: coords.y + 1, x: coords.x},
-      {y: coords.y, x: coords.x + 1},
-      {y: coords.y, x: coords.x + 2},
-      {y: coords.y + 2, x: coords.x + 1},
-    ];
-    coordsBuild.forEach(el => {
-      this.matrix[el.y][el.x] = true;
-    });
-    return coordsBuild;
-  }
-
-  buildGliderRD = (coords) => {
-    const coordsBuild = [
-      {y: coords.y, x: coords.x},
-      {y: coords.y, x: coords.x + 2},
-      {y: coords.y + 1, x: coords.x + 1},
-      {y: coords.y + 1, x: coords.x + 2},
-      {y: coords.y + 2, x: coords.x + 1},
-    ];
-    coordsBuild.forEach(el => {
-      this.matrix[el.y][el.x] = true;
-    });
-    return coordsBuild;
-  }
-
-  buildGliderLD = (coords) => {
-    const coordsBuild = [
-      {y: coords.y, x: coords.x + 2},
-      {y: coords.y + 1, x: coords.x},
-      {y: coords.y + 1, x: coords.x + 1},
-      {y: coords.y + 2, x: coords.x + 1},
-      {y: coords.y + 2, x: coords.x + 2},
-    ];
-    coordsBuild.forEach(el => {
-      this.matrix[el.y][el.x] = true;
-    });
-    return coordsBuild;
-  }
-
-  buildHivenudger = (coords) => {
-    const coordsBuild = [
-      {y: coords.y, x: coords.x},
-      {y: coords.y, x: coords.x + 1},
-      {y: coords.y, x: coords.x + 2},
-      {y: coords.y, x: coords.x + 3},
-      {y: coords.y, x: coords.x + 9},
-      {y: coords.y, x: coords.x + 12},
-      {y: coords.y + 1, x: coords.x},
-      {y: coords.y + 1, x: coords.x + 4},
-      {y: coords.y + 1, x: coords.x + 8},
-      {y: coords.y + 2, x: coords.x + 0},
-      {y: coords.y + 2, x: coords.x + 8},
-      {y: coords.y + 2, x: coords.x + 12},
-      {y: coords.y + 3, x: coords.x + 1},
-      {y: coords.y + 3, x: coords.x + 4},
-      {y: coords.y + 3, x: coords.x + 8},
-      {y: coords.y + 3, x: coords.x + 9},
-      {y: coords.y + 3, x: coords.x + 10},
-      {y: coords.y + 3, x: coords.x + 11},
-      {y: coords.y + 5, x: coords.x + 5},
-      {y: coords.y + 5, x: coords.x + 6},
-      {y: coords.y + 6, x: coords.x + 5},
-      {y: coords.y + 6, x: coords.x + 6},
-      {y: coords.y + 7, x: coords.x + 5},
-      {y: coords.y + 7, x: coords.x + 6},
-      {y: coords.y + 9, x: coords.x + 1},
-      {y: coords.y + 9, x: coords.x + 4},
-      {y: coords.y + 9, x: coords.x + 8},
-      {y: coords.y + 9, x: coords.x + 9},
-      {y: coords.y + 9, x: coords.x + 10},
-      {y: coords.y + 9, x: coords.x + 11},
-      {y: coords.y + 10, x: coords.x},
-      {y: coords.y + 10, x: coords.x + 8},
-      {y: coords.y + 10, x: coords.x + 12},
-      {y: coords.y + 11, x: coords.x},
-      {y: coords.y + 11, x: coords.x + 4},
-      {y: coords.y + 11, x: coords.x + 8},
-      {y: coords.y + 12, x: coords.x},
-      {y: coords.y + 12, x: coords.x + 1},
-      {y: coords.y + 12, x: coords.x + 2},
-      {y: coords.y + 12, x: coords.x + 3},
-      {y: coords.y + 12, x: coords.x + 9},
-      {y: coords.y + 12, x: coords.x + 12},
-    ];
-    coordsBuild.forEach(el => {
-      this.matrix[el.y][el.x] = true;
-    });
-    return coordsBuild;
+    return shema.map(el => ({y: el[0] + coords.y, x: el[1] + coords.x}));
   }
 
   constructBuilding = (coords) => {
-    switch (this.build) {
-      case constants.GLIDER_RU:
-        return this.buildGliderRU(coords);
-      case constants.GLIDER_LU:
-        return this.buildGliderLU(coords);
-      case constants.GLIDER_RD:
-        return this.buildGliderRD(coords);
-      case constants.GLIDER_LD:
-        return this.buildGliderLD(coords);
-        case constants.Hivenudger:
-        return this.buildHivenudger(coords);
+    switch (this.name) {
+      case constants.GLIDER_RU.name:
+        return this.build(coords, constants.GLIDER_RU.shema);
+      case constants.GLIDER_LU.name:
+        return this.build(coords, constants.GLIDER_LU.shema);
+      case constants.GLIDER_RD.name:
+        return this.build(coords, constants.GLIDER_RD.shema);
+      case constants.GLIDER_LD.name:
+        return this.build(coords, constants.GLIDER_LD.shema);
+        case constants.Hivenudger.name:
+        return this.build(coords, constants.Hivenudger.shema);
       default: return;
     }
   }
@@ -431,7 +374,7 @@ class Builder {
     div.classList.add('buildElement');
     div.textContent = name;
     div.addEventListener('click', () => {
-      this.build = name;
+      this.name = name;
       currentBuild.textContent = name;
       builds.classList.add('d-none');
     });
@@ -441,7 +384,7 @@ class Builder {
 
   init = () => {
     Object.keys(constants).forEach(el => {
-      this.buildElementsCreator(constants[el]);
+      this.buildElementsCreator(constants[el].name);
     });
   }
 
