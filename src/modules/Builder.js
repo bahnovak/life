@@ -9,7 +9,7 @@ const builds = document.querySelector('#builds');
 export default class Builder {
   constructor(matrix) {
     this.matrix = matrix;
-    this.name = constants['101'].name;
+    this.name = '101';
   }
 
   updateMatrix = (matrix) => {
@@ -24,31 +24,18 @@ export default class Builder {
   };
 
   constructBuilding = (coords) => {
-    switch (this.name) {
-      case constants['101'].name:
-        return this.build(coords, constants['101'].schema);
-      case constants['103P4H1V0.RLE'].name:
-        return this.build(coords, constants['103P4H1V0.RLE'].schema);
-      // case constants.GLIDER_RD.name:
-      //   return this.build(coords, constants['101'].shema);
-      // case constants.GLIDER_LD.name:
-      //   return this.build(coords, constants['101'].shema);
-      // case constants.Hivenudger.name:
-      //   return this.build(coords, constants['101'].shema);
-      // case constants.Blinker.name:
-      //   return this.build(coords, constants['101'].shema);
-      default:
-        return [];
-    }
+    let name = this.name.toUpperCase();
+    name = name.replace(' ', '_').trim();
+    return this.build(coords, constants[name].schema);
   };
 
   buildElementsCreator = (name) => {
     const div = document.createElement('div');
     div.classList.add('buildElement');
-    div.textContent = name;
+    div.textContent = constants[name].name;
     div.addEventListener('click', () => {
       this.name = name;
-      currentBuild.textContent = name;
+      currentBuild.textContent = constants[name].name;
       builds.classList.add('d-none');
     });
 
@@ -56,8 +43,9 @@ export default class Builder {
   };
 
   init = () => {
+    currentBuild.textContent = constants[this.name].name;
     Object.keys(constants).forEach((el) => {
-      this.buildElementsCreator(constants[el].name);
+      this.buildElementsCreator(el);
     });
   };
 }

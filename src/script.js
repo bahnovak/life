@@ -1,4 +1,3 @@
-// https://conwaylife.com/wiki/
 import './style.css';
 import Builder from './modules/Builder';
 
