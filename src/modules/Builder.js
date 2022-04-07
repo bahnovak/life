@@ -18,7 +18,7 @@ export default class Builder {
 
   build = (coords, schema) => {
     schema.forEach((el) => {
-      this.matrix[el[0] + coords.y][el[1] + coords.x] = true;
+      this.matrix[el[0] + coords.y][el[1] + coords.x] = 1;
     });
     return schema.map((el) => ({ y: el[0] + coords.y, x: el[1] + coords.x }));
   };
