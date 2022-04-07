@@ -35,7 +35,7 @@ class Game {
   constructor({ x, y }) {
     this.sizeX = x;
     this.sizeY = y;
-    this.ratio = 5;
+    this.ratio = 4;
     this.canvasSizeX = Math.floor(this.sizeX * this.ratio);
     this.canvasSizeY = Math.floor(this.sizeY * this.ratio);
     this.matrixTemplate = JSON.stringify(getMatrix({ x: this.canvasSizeX, y: this.canvasSizeY }));
@@ -231,7 +231,7 @@ class Game {
       this.render();
     };
 
-    this.interval = setInterval(startLoop, 20);
+    this.interval = setInterval(startLoop, 10);
 
     if (!status) {
       clearInterval(this.interval);
