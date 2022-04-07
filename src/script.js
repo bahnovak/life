@@ -238,7 +238,7 @@ class Game {
       this.render();
     };
 
-    this.interval = setInterval(startLoop, 20);
+    this.interval = setInterval(startLoop, 10);
 
     if (!status) {
       clearInterval(this.interval);
