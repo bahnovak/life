@@ -14,13 +14,9 @@ const checkbox = document.querySelector('#checkbox');
 const builds = document.querySelector('#builds');
 
 const getMatrix = ({ x, y }) => {
-  const matrix = [];
-
+  const matrix = new Array(y);
   for (let i = 0; i < y; i += 1) {
-    matrix.push([]);
-    for (let j = 0; j < x; j += 1) {
-      matrix[i].push(0);
-    }
+    matrix[i] = new Uint8Array(x);
   }
 
   return matrix;
@@ -38,8 +34,7 @@ class Game {
     this.ratio = 2;
     this.matrixX = this.sizeX / this.ratio;
     this.matrixY = this.sizeY / this.ratio;
-    this.matrixTemplate = JSON.stringify(getMatrix({ x: this.matrixX, y: this.matrixY }));
-    this.matrix = JSON.parse(this.matrixTemplate);
+    this.matrix = getMatrix({ x: this.matrixX, y: this.matrixY });
     this.isPause = true;
     this.isBuild = false;
     this.builder = new Builder(this.matrix);
@@ -208,7 +203,7 @@ class Game {
   startLife = (status = true) => {
     clearInterval(this.interval);
     const startLoop = () => {
-      const newMatrix = JSON.parse(this.matrixTemplate);
+      const newMatrix = getMatrix({ x: this.matrixX, y: this.matrixY });
       this.matrixDraw = new Path2D();
       for (let i = 0; i < this.matrixY; i += 1) {
         for (let j = 0; j < this.matrixX; j += 1) {
@@ -261,7 +256,7 @@ class Game {
     });
 
     clear.addEventListener('click', () => {
-      this.matrix = JSON.parse(this.matrixTemplate);
+      this.matrix = getMatrix({ x: this.matrixX, y: this.matrixY });
       this.builder.updateMatrix(this.matrix);
       this.matrixDraw = new Path2D();
       this.render();
