@@ -7,8 +7,10 @@ const currentBuild = document.querySelector('#currentBuild');
 const builds = document.querySelector('#builds');
 
 export default class Builder {
-  constructor(matrix) {
+  constructor(matrix, matrixX, matrixY) {
     this.matrix = matrix;
+    this.matrixX = matrixX;
+    this.matrixY = matrixY;
     this.name = '101';
   }
 
@@ -18,7 +20,7 @@ export default class Builder {
 
   build = (coords, schema) => {
     schema.forEach((el) => {
-      this.matrix[el[0] + coords.y][el[1] + coords.x] = 1;
+      this.matrix[(el[0] + coords.y) * this.matrixX + el[1] + coords.x] = 1;
     });
     return schema.map((el) => ({ y: el[0] + coords.y, x: el[1] + coords.x }));
   };
