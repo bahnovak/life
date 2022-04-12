@@ -7,10 +7,9 @@ const currentBuild = document.querySelector('#currentBuild');
 const builds = document.querySelector('#builds');
 
 export default class Builder {
-  constructor(matrix, matrixX, matrixY) {
+  constructor(matrix, matrixX) {
     this.matrix = matrix;
     this.matrixX = matrixX;
-    this.matrixY = matrixY;
     this.name = '101';
   }
 

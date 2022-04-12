@@ -24,12 +24,14 @@ class Game {
   constructor({ x, y }) {
     this.sizeX = x;
     this.sizeY = y;
-    this.ratio = 1;
-    this.matrixX = this.sizeX / this.ratio;
-    this.matrixY = this.sizeY / this.ratio;
+    this.matrixX = this.sizeX / 2;
+    this.matrixY = this.sizeY / 2;
+    this.lastCountX = this.matrixX - 1;
+    this.lastCountY = this.matrixY - 1;
     this.matrix = getMatrix({ x: this.matrixX, y: this.matrixY });
-    this.imgData = context.createImageData(this.matrixX, this.matrixY);
-    this.imgBufer = new Uint8ClampedArray(this.matrixX * this.matrixY * 4);
+    this.matrixBufer = getMatrix({ x: this.matrixX, y: this.matrixY });
+    this.imgData = context.createImageData(this.sizeX, this.sizeY);
+    this.imgBufer = new Uint8ClampedArray(this.sizeX * this.sizeY * 4);
     this.isPause = true;
     this.isBuild = false;
     this.builder = new Builder(this.matrix, this.matrixX, this.matrixY);
@@ -37,154 +39,164 @@ class Game {
 
   checkNeighbours = (i, j) => {
     let count = 0;
-    const lastCountX = this.matrixX - 1;
-    const lastCountY = this.matrixY - 1;
 
-    if ((i > 0) && (j > 0) && (i < lastCountY) && (j < lastCountX)) {
-      count = this.matrix[(i - 1) * this.matrixX + j - 1]
-      + this.matrix[(i - 1) * this.matrixX + j]
-      + this.matrix[(i - 1) * this.matrixX + j + 1]
-      + this.matrix[i * this.matrixX + j - 1]
-      + this.matrix[i * this.matrixX + j + 1]
-      + this.matrix[(i + 1) * this.matrixX + j - 1]
-      + this.matrix[(i + 1) * this.matrixX + j]
-      + this.matrix[(i + 1) * this.matrixX + j + 1];
-      return count;
+    if ((i > 0) && (j > 0) && (i < this.lastCountY) && (j < this.lastCountX)) {
+      return this.matrix[(i - 1) * this.matrixX + j - 1]
+        + this.matrix[(i - 1) * this.matrixX + j]
+        + this.matrix[(i - 1) * this.matrixX + j + 1]
+        + this.matrix[i * this.matrixX + j - 1]
+        + this.matrix[i * this.matrixX + j + 1]
+        + this.matrix[(i + 1) * this.matrixX + j - 1]
+        + this.matrix[(i + 1) * this.matrixX + j]
+        + this.matrix[(i + 1) * this.matrixX + j + 1];
     }
 
-    // // Left Up
+    // Left Up
 
-    // if (i === 0 && j === 0 && this.matrix[lastCountY][lastCountX]) {
-    //   count += 1;
-    // }
+    if (i === 0 && j === 0 && this.matrix[this.matrixX * this.matrixY - 1]) {
+      count += 1;
+    }
 
-    // if (i === 0 && j > 0 && this.matrix[lastCountY][j - 1]) {
-    //   count += 1;
-    // }
+    if (i === 0 && j > 0 && this.matrix[this.lastCountY * this.matrixX + j - 1]) {
+      count += 1;
+    }
 
-    // if (i > 0 && j === 0 && this.matrix[i - 1][lastCountX]) {
-    //   count += 1;
-    // }
+    if (i > 0 && j === 0 && this.matrix[(i - 1) * this.matrixX + this.lastCountX]) {
+      count += 1;
+    }
 
-    // if (i > 0 && j > 0 && this.matrix[i - 1][j - 1]) {
-    //   count += 1;
-    // }
+    if (i > 0 && j > 0 && this.matrix[(i - 1) * this.matrixX + j - 1]) {
+      count += 1;
+    }
 
-    // // Up
+    // Up
 
-    // if (i === 0 && this.matrix[lastCountY][j]) {
-    //   count += 1;
-    // }
+    if (i === 0 && this.matrix[this.lastCountY * this.matrixX + j]) {
+      count += 1;
+    }
 
-    // if (i > 0 && this.matrix[i - 1][j]) {
-    //   count += 1;
-    // }
+    if (i > 0 && this.matrix[(i - 1) * this.matrixX + j]) {
+      count += 1;
+    }
 
-    // // Right Up
+    // Right Up
 
-    // if (i === 0 && j === lastCountX && this.matrix[lastCountY][0]) {
-    //   count += 1;
-    // }
+    if (i === 0 && j === this.lastCountX && this.matrix[this.lastCountY * this.matrixX]) {
+      count += 1;
+    }
 
-    // if (i === 0 && j < lastCountX && this.matrix[lastCountY][j + 1]) {
-    //   count += 1;
-    // }
+    if (i === 0 && j < this.lastCountX && this.matrix[this.lastCountY * this.matrixX + j + 1]) {
+      count += 1;
+    }
 
-    // if (i > 0 && j === lastCountX && this.matrix[i - 1][0]) {
-    //   count += 1;
-    // }
+    if (i > 0 && j === this.lastCountX && this.matrix[(i - 1) * this.matrixX]) {
+      count += 1;
+    }
 
-    // if (i > 0 && j < lastCountX && this.matrix[i - 1][j + 1]) {
-    //   count += 1;
-    // }
+    if (i > 0 && j < this.lastCountX && this.matrix[(i - 1) * this.matrixX + j + 1]) {
+      count += 1;
+    }
 
-    // // Left
+    // Left
 
-    // if (j === 0 && this.matrix[i][lastCountX]) {
-    //   count += 1;
-    // }
+    if (j === 0 && this.matrix[i * this.matrixX + this.lastCountX]) {
+      count += 1;
+    }
 
-    // if (j > 0 && this.matrix[i][j - 1]) {
-    //   count += 1;
-    // }
+    if (j > 0 && this.matrix[i * this.matrixX + j - 1]) {
+      count += 1;
+    }
 
-    // // Right
+    // Right
 
-    // if (j === lastCountX && this.matrix[i][0]) {
-    //   count += 1;
-    // }
+    if (j === this.lastCountX && this.matrix[i * this.matrixX]) {
+      count += 1;
+    }
 
-    // if (j < lastCountX && this.matrix[i][j + 1]) {
-    //   count += 1;
-    // }
+    if (j < this.lastCountX && this.matrix[i * this.matrixX + j + 1]) {
+      count += 1;
+    }
 
-    // // Left Down
+    // Left Down
 
-    // if (i === lastCountY && j === 0 && this.matrix[0][lastCountX]) {
-    //   count += 1;
-    // }
+    if (i === this.lastCountY && j === 0 && this.matrix[this.lastCountX]) {
+      count += 1;
+    }
 
-    // if (i === lastCountY && j > 0 && this.matrix[0][j - 1]) {
-    //   count += 1;
-    // }
+    if (i === this.lastCountY && j > 0 && this.matrix[j - 1]) {
+      count += 1;
+    }
 
-    // if (i < lastCountY && j === 0 && this.matrix[i + 1][lastCountX]) {
-    //   count += 1;
-    // }
+    if (i < this.lastCountY && j === 0 && this.matrix[(i + 1) * this.matrixX + this.lastCountX]) {
+      count += 1;
+    }
 
-    // if (i < lastCountY && j > 0 && this.matrix[i + 1][j - 1]) {
-    //   count += 1;
-    // }
+    if (i < this.lastCountY && j > 0 && this.matrix[(i + 1) * this.matrixX + j - 1]) {
+      count += 1;
+    }
 
-    // // Down
+    // Down
 
-    // if (i === lastCountY && this.matrix[0][j]) {
-    //   count += 1;
-    // }
+    if (i === this.lastCountY && this.matrix[j]) {
+      count += 1;
+    }
 
-    // if (i < lastCountY && this.matrix[i + 1][j]) {
-    //   count += 1;
-    // }
+    if (i < this.lastCountY && this.matrix[(i + 1) * this.matrixX + j]) {
+      count += 1;
+    }
 
-    // // Right Down
+    // Right Down
 
-    // if (i === lastCountY && j === lastCountX && this.matrix[0][0]) {
-    //   count += 1;
-    // }
+    if (i === this.lastCountY && j === this.lastCountX && this.matrix[0]) {
+      count += 1;
+    }
 
-    // if (i < lastCountY && j === lastCountX && this.matrix[i + 1][0]) {
-    //   count += 1;
-    // }
+    if (i < this.lastCountY && j === this.lastCountX && this.matrix[(i + 1) * this.matrixX]) {
+      count += 1;
+    }
 
-    // if (i === lastCountY && j < lastCountX && this.matrix[0][j + 1]) {
-    //   count += 1;
-    // }
+    if (i === this.lastCountY && j < this.lastCountX && this.matrix[j + 1]) {
+      count += 1;
+    }
 
-    // if (i < lastCountY && j < lastCountX && this.matrix[i + 1][j + 1]) {
-    //   count += 1;
-    // }
+    if (i < this.lastCountY && j < this.lastCountX && this.matrix[(i + 1) * this.matrixX + j + 1]) {
+      count += 1;
+    }
 
-    // return count;
+    return count;
   };
+
+  setPixel(x, y, isClear) {
+    this.imgBufer[(y * 2 * this.sizeX + x * 2) * 4] = 187;
+    this.imgBufer[(y * 2 * this.sizeX + x * 2) * 4 + 1] = 208;
+    this.imgBufer[(y * 2 * this.sizeX + x * 2) * 4 + 2] = 219;
+    this.imgBufer[(y * 2 * this.sizeX + x * 2) * 4 + 3] = isClear ? 0 : 255;
+
+    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2) * 4] = 187;
+    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2) * 4 + 1] = 208;
+    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2) * 4 + 2] = 219;
+    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2) * 4 + 3] = isClear ? 0 : 255;
+
+    this.imgBufer[(y * 2 * this.sizeX + x * 2 + 1) * 4] = 187;
+    this.imgBufer[(y * 2 * this.sizeX + x * 2 + 1) * 4 + 1] = 208;
+    this.imgBufer[(y * 2 * this.sizeX + x * 2 + 1) * 4 + 2] = 219;
+    this.imgBufer[(y * 2 * this.sizeX + x * 2 + 1) * 4 + 3] = isClear ? 0 : 255;
+
+    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2 + 1) * 4] = 187;
+    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2 + 1) * 4 + 1] = 208;
+    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2 + 1) * 4 + 2] = 219;
+    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2 + 1) * 4 + 3] = isClear ? 0 : 255;
+  }
 
   changeStatusCell = (coords, isBuild = false) => {
     if (isBuild) {
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4] = 0;
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4 + 1] = 0;
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4 + 2] = 0;
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4 + 3] = 255;
+      this.setPixel(coords.x, coords.y);
     } else if (this.matrix[coords.y * this.matrixX + coords.x] === 0) {
       this.matrix[coords.y * this.matrixX + coords.x] = 1;
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4] = 0;
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4 + 1] = 0;
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4 + 2] = 0;
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4 + 3] = 255;
-    } else {
+      this.setPixel(coords.x, coords.y);
+    } else if (this.matrix[coords.y * this.matrixX + coords.x] === 1) {
       this.matrix[coords.y * this.matrixX + coords.x] = 0;
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4] = 255;
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4 + 1] = 255;
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4 + 2] = 255;
-      this.imgBufer[(coords.y * this.matrixX + coords.x) * 4 + 3] = 255;
+      this.setPixel(coords.x, coords.y, true);
     }
   };
 
@@ -204,34 +216,24 @@ class Game {
   startLife = (status = true) => {
     clearInterval(this.interval);
     const startLoop = () => {
-      const newMatrix = getMatrix({ x: this.matrixX, y: this.matrixY });
-      this.imgBufer = new Uint8ClampedArray(this.matrixX * this.matrixY * 4);
-      for (let i = 0; i < newMatrix.length; i += 1) {
+      this.matrixBufer.fill(0);
+      this.imgBufer.fill(0);
+      for (let i = 0; i < this.matrixBufer.length; i += 1) {
         const y = Math.floor(i / this.matrixX);
         const x = i % this.matrixX;
         const countNeighbours = this.checkNeighbours(y, x);
-        if (this.matrix[i] === 1 && (countNeighbours === 2 || countNeighbours === 3)) {
-          newMatrix[i] = 1;
-          this.imgBufer[i * 4] = 0;
-          this.imgBufer[i * 4 + 1] = 0;
-          this.imgBufer[i * 4 + 2] = 0;
-          this.imgBufer[i * 4 + 3] = 255;
-        }
-
-        if (this.matrix[i] === 0 && countNeighbours === 3) {
-          newMatrix[i] = 1;
-          this.imgBufer[i * 4] = 0;
-          this.imgBufer[i * 4 + 1] = 0;
-          this.imgBufer[i * 4 + 2] = 0;
-          this.imgBufer[i * 4 + 3] = 255;
+        if ((this.matrix[i] === 1 && (countNeighbours === 2 || countNeighbours === 3))
+        || (this.matrix[i] === 0 && countNeighbours === 3)) {
+          this.matrixBufer[i] = 1;
+          this.setPixel(x, y);
         }
       }
-      this.matrix = newMatrix;
+      this.matrix = this.matrixBufer.slice();
       this.builder.updateMatrix(this.matrix);
       this.render();
     };
 
-    this.interval = setInterval(startLoop, 20);
+    this.interval = setInterval(startLoop, 15);
 
     if (!status) {
       clearInterval(this.interval);
@@ -256,15 +258,15 @@ class Game {
     clear.addEventListener('click', () => {
       this.matrix = getMatrix({ x: this.matrixX, y: this.matrixY });
       this.builder.updateMatrix(this.matrix);
-      this.imgBufer = new Uint8ClampedArray(this.matrixX * this.matrixY * 4);
+      this.imgBufer = this.imgBufer.fill(0);
       this.render();
     });
 
     root.addEventListener('click', (e) => {
       let x = e.offsetX;
       let y = e.offsetY;
-      x = Math.floor(x / this.ratio);
-      y = Math.floor(y / this.ratio);
+      x = Math.floor(x / 2);
+      y = Math.floor(y / 2);
 
       if (this.isBuild) {
         const coords = this.builder.constructBuilding({ x, y });
@@ -274,6 +276,7 @@ class Game {
         this.render();
       } else {
         this.changeStatusCell({ x, y });
+        this.render();
       }
     });
 
@@ -281,8 +284,10 @@ class Game {
       builds.classList.remove('d-none');
     });
 
-    checkbox.addEventListener('click', () => {
+    checkbox.addEventListener('click', (e) => {
+      e.preventDefault();
       this.isBuild = !this.isBuild;
+      checkbox.classList.toggle('checkbox-active');
     });
   };
 }
