@@ -102,6 +102,7 @@ body {
     padding: 10px;
     cursor: pointer;
     border-radius: 5px;
+    overflow-wrap: break-word;
 }
 
 .buildElement:hover {
