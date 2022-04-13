@@ -7,9 +7,11 @@ const currentBuild = document.querySelector('#currentBuild');
 const builds = document.querySelector('#builds');
 
 export default class Builder {
-  constructor(matrix, matrixX) {
+  constructor(matrix, matrixX, lastcountX, lastcountY) {
     this.matrix = matrix;
     this.matrixX = matrixX;
+    this.lastcountX = lastcountX;
+    this.lastcountY = lastcountY;
     this.name = '101';
   }
 
@@ -17,11 +19,27 @@ export default class Builder {
     this.matrix = matrix;
   };
 
+  getCorrectCoord = (shift, value, direction) => {
+    if (direction === 'x') {
+      if (shift + value > this.lastcountX) {
+        return shift + value - this.lastcountX - 1;
+      }
+    }
+
+    if (direction === 'y') {
+      if (shift + value > this.lastcountY) {
+        return shift + value - this.lastcountY - 1;
+      }
+    }
+
+    return shift + value;
+  };
+
   build = (coords, schema) => {
     schema.forEach((el) => {
-      this.matrix[(el[0] + coords.y) * this.matrixX + el[1] + coords.x] = 1;
+      this.matrix[(this.getCorrectCoord(el[0], coords.y, 'y')) * this.matrixX + this.getCorrectCoord(el[1], coords.x, 'x')] = 1;
     });
-    return schema.map((el) => ({ y: el[0] + coords.y, x: el[1] + coords.x }));
+    return schema.map((el) => ({ y: this.getCorrectCoord(el[0], coords.y, 'y'), x: this.getCorrectCoord(el[1], coords.x, 'x') }));
   };
 
   constructBuilding = (coords) => {

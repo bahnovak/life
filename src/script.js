@@ -2,8 +2,10 @@ import './style.css';
 import Builder from './modules/Builder';
 
 const root = document.querySelector('#root');
+const body = document.querySelector('body');
 const context = root.getContext('2d');
-const canvasWrap = document.querySelector('.canvasWrap');
+const loader = document.querySelector('#loader');
+const builds = document.querySelector('#builds');
 
 const start = document.querySelector('#start');
 const clear = document.querySelector('#clear');
@@ -11,13 +13,11 @@ const chooseBuild = document.querySelector('#chooseBuild');
 const close = document.querySelector('#close');
 const checkbox = document.querySelector('#checkbox');
 
-const builds = document.querySelector('#builds');
-
 const getMatrix = ({ x, y }) => new Uint8Array(x * y);
 
 const getSize = () => ({
-  x: Math.floor(canvasWrap.clientWidth / 40) * 40,
-  y: Math.floor(canvasWrap.clientHeight / 40) * 40,
+  x: Math.floor((body.clientWidth - 80) / 40) * 40,
+  y: Math.floor((body.clientHeight - 80) / 40) * 40,
 });
 
 class Game {
@@ -34,7 +34,7 @@ class Game {
     this.imgBufer = new Uint8ClampedArray(this.sizeX * this.sizeY * 4);
     this.isPause = true;
     this.isBuild = false;
-    this.builder = new Builder(this.matrix, this.matrixX, this.matrixY);
+    this.builder = new Builder(this.matrix, this.matrixX, this.lastCountX, this.lastCountY);
   }
 
   checkNeighbours = (i, j) => {
@@ -206,6 +206,7 @@ class Game {
     root.width = this.sizeX;
     root.height = this.sizeY;
     this.builder.init();
+    loader.classList.add('v-hidden');
   };
 
   render = () => {
@@ -223,7 +224,7 @@ class Game {
         const x = i % this.matrixX;
         const countNeighbours = this.checkNeighbours(y, x);
         if ((this.matrix[i] === 1 && (countNeighbours === 2 || countNeighbours === 3))
-        || (this.matrix[i] === 0 && countNeighbours === 3)) {
+          || (this.matrix[i] === 0 && countNeighbours === 3)) {
           this.matrixBufer[i] = 1;
           this.setPixel(x, y);
         }
