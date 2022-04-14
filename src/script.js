@@ -16,8 +16,8 @@ const checkbox = document.querySelector('#checkbox');
 const getMatrix = ({ x, y }) => new Uint8Array(x * y);
 
 const getSize = () => ({
-  x: Math.floor((body.clientWidth - 50) / 40) * 40,
-  y: Math.floor((body.clientHeight - 50) / 40) * 40,
+  x: Math.floor((body.clientWidth - 60) / 40) * 40,
+  y: Math.floor((body.clientHeight - 60) / 40) * 40,
 });
 
 class Game {
