@@ -99,7 +99,7 @@ class Game {
         const down = (y === this.lastCountY) ? 0 : (y + 1);
         const left = (x === 0) ? this.lastCountX : (x - 1);
 
-        const countNeighbours =  this.matrix[up * this.matrixX + left]
+        const countNeighbours = this.matrix[up * this.matrixX + left]
           + this.matrix[up * this.matrixX + x]
           + this.matrix[up * this.matrixX + right]
           + this.matrix[y * this.matrixX + left]
