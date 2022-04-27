@@ -37,135 +37,6 @@ class Game {
     this.builder = new Builder(this.matrix, this.matrixX, this.lastCountX, this.lastCountY);
   }
 
-  checkNeighbours = (i, j) => {
-    let count = 0;
-
-    if ((i > 0) && (j > 0) && (i < this.lastCountY) && (j < this.lastCountX)) {
-      return this.matrix[(i - 1) * this.matrixX + j - 1]
-        + this.matrix[(i - 1) * this.matrixX + j]
-        + this.matrix[(i - 1) * this.matrixX + j + 1]
-        + this.matrix[i * this.matrixX + j - 1]
-        + this.matrix[i * this.matrixX + j + 1]
-        + this.matrix[(i + 1) * this.matrixX + j - 1]
-        + this.matrix[(i + 1) * this.matrixX + j]
-        + this.matrix[(i + 1) * this.matrixX + j + 1];
-    }
-
-    // Left Up
-
-    if (i === 0 && j === 0 && this.matrix[this.matrixX * this.matrixY - 1]) {
-      count += 1;
-    }
-
-    if (i === 0 && j > 0 && this.matrix[this.lastCountY * this.matrixX + j - 1]) {
-      count += 1;
-    }
-
-    if (i > 0 && j === 0 && this.matrix[(i - 1) * this.matrixX + this.lastCountX]) {
-      count += 1;
-    }
-
-    if (i > 0 && j > 0 && this.matrix[(i - 1) * this.matrixX + j - 1]) {
-      count += 1;
-    }
-
-    // Up
-
-    if (i === 0 && this.matrix[this.lastCountY * this.matrixX + j]) {
-      count += 1;
-    }
-
-    if (i > 0 && this.matrix[(i - 1) * this.matrixX + j]) {
-      count += 1;
-    }
-
-    // Right Up
-
-    if (i === 0 && j === this.lastCountX && this.matrix[this.lastCountY * this.matrixX]) {
-      count += 1;
-    }
-
-    if (i === 0 && j < this.lastCountX && this.matrix[this.lastCountY * this.matrixX + j + 1]) {
-      count += 1;
-    }
-
-    if (i > 0 && j === this.lastCountX && this.matrix[(i - 1) * this.matrixX]) {
-      count += 1;
-    }
-
-    if (i > 0 && j < this.lastCountX && this.matrix[(i - 1) * this.matrixX + j + 1]) {
-      count += 1;
-    }
-
-    // Left
-
-    if (j === 0 && this.matrix[i * this.matrixX + this.lastCountX]) {
-      count += 1;
-    }
-
-    if (j > 0 && this.matrix[i * this.matrixX + j - 1]) {
-      count += 1;
-    }
-
-    // Right
-
-    if (j === this.lastCountX && this.matrix[i * this.matrixX]) {
-      count += 1;
-    }
-
-    if (j < this.lastCountX && this.matrix[i * this.matrixX + j + 1]) {
-      count += 1;
-    }
-
-    // Left Down
-
-    if (i === this.lastCountY && j === 0 && this.matrix[this.lastCountX]) {
-      count += 1;
-    }
-
-    if (i === this.lastCountY && j > 0 && this.matrix[j - 1]) {
-      count += 1;
-    }
-
-    if (i < this.lastCountY && j === 0 && this.matrix[(i + 1) * this.matrixX + this.lastCountX]) {
-      count += 1;
-    }
-
-    if (i < this.lastCountY && j > 0 && this.matrix[(i + 1) * this.matrixX + j - 1]) {
-      count += 1;
-    }
-
-    // Down
-
-    if (i === this.lastCountY && this.matrix[j]) {
-      count += 1;
-    }
-
-    if (i < this.lastCountY && this.matrix[(i + 1) * this.matrixX + j]) {
-      count += 1;
-    }
-
-    // Right Down
-
-    if (i === this.lastCountY && j === this.lastCountX && this.matrix[0]) {
-      count += 1;
-    }
-
-    if (i < this.lastCountY && j === this.lastCountX && this.matrix[(i + 1) * this.matrixX]) {
-      count += 1;
-    }
-
-    if (i === this.lastCountY && j < this.lastCountX && this.matrix[j + 1]) {
-      count += 1;
-    }
-
-    if (i < this.lastCountY && j < this.lastCountX && this.matrix[(i + 1) * this.matrixX + j + 1]) {
-      count += 1;
-    }
-
-    return count;
-  };
-
   setPixel(x, y, isClear) {
     this.imgBufer[(y * 2 * this.sizeX + x * 2) * 4] = 187;
     this.imgBufer[(y * 2 * this.sizeX + x * 2) * 4 + 1] = 208;
@@ -222,7 +93,21 @@ class Game {
       for (let i = 0; i < this.matrixBufer.length; i += 1) {
         const y = Math.floor(i / this.matrixX);
         const x = i % this.matrixX;
-        const countNeighbours = this.checkNeighbours(y, x);
+
+        const up = (y === 0) ? this.lastCountY : (y - 1);
+        const right = (x === this.lastCountX) ? 0 : (x + 1);
+        const down = (y === this.lastCountY) ? 0 : (y + 1);
+        const left = (x === 0) ? this.lastCountX : (x - 1);
+
+        const countNeighbours =  this.matrix[up * this.matrixX + left]
+          + this.matrix[up * this.matrixX + x]
+          + this.matrix[up * this.matrixX + right]
+          + this.matrix[y * this.matrixX + left]
+          + this.matrix[y * this.matrixX + right]
+          + this.matrix[down * this.matrixX + left]
+          + this.matrix[down * this.matrixX + x]
+          + this.matrix[down * this.matrixX + right];
+
         if ((this.matrix[i] === 1 && (countNeighbours === 2 || countNeighbours === 3))
           || (this.matrix[i] === 0 && countNeighbours === 3)) {
           this.matrixBufer[i] = 1;
