@@ -2,6 +2,7 @@ import './style.css';
 import Builder from './modules/Builder';
 
 const root = document.querySelector('#root');
+const canvasWrap = document.querySelector('.canvasWrap');
 const body = document.querySelector('body');
 const context = root.getContext('2d');
 const loader = document.querySelector('#loader');
@@ -24,8 +25,8 @@ class Game {
   constructor({ x, y }) {
     this.sizeX = x;
     this.sizeY = y;
-    this.matrixX = this.sizeX / 2;
-    this.matrixY = this.sizeY / 2;
+    this.matrixX = this.sizeX;
+    this.matrixY = this.sizeY;
     this.lastCountX = this.matrixX - 1;
     this.lastCountY = this.matrixY - 1;
     this.matrix = getMatrix({ x: this.matrixX, y: this.matrixY });
@@ -38,25 +39,10 @@ class Game {
   }
 
   setPixel(x, y, isClear) {
-    this.imgBufer[(y * 2 * this.sizeX + x * 2) * 4] = 187;
-    this.imgBufer[(y * 2 * this.sizeX + x * 2) * 4 + 1] = 208;
-    this.imgBufer[(y * 2 * this.sizeX + x * 2) * 4 + 2] = 219;
-    this.imgBufer[(y * 2 * this.sizeX + x * 2) * 4 + 3] = isClear ? 0 : 255;
-
-    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2) * 4] = 187;
-    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2) * 4 + 1] = 208;
-    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2) * 4 + 2] = 219;
-    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2) * 4 + 3] = isClear ? 0 : 255;
-
-    this.imgBufer[(y * 2 * this.sizeX + x * 2 + 1) * 4] = 187;
-    this.imgBufer[(y * 2 * this.sizeX + x * 2 + 1) * 4 + 1] = 208;
-    this.imgBufer[(y * 2 * this.sizeX + x * 2 + 1) * 4 + 2] = 219;
-    this.imgBufer[(y * 2 * this.sizeX + x * 2 + 1) * 4 + 3] = isClear ? 0 : 255;
-
-    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2 + 1) * 4] = 187;
-    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2 + 1) * 4 + 1] = 208;
-    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2 + 1) * 4 + 2] = 219;
-    this.imgBufer[((y * 2 + 1) * this.sizeX + x * 2 + 1) * 4 + 3] = isClear ? 0 : 255;
+    this.imgBufer[(y * this.sizeX + x) * 4] = 187;
+    this.imgBufer[(y * this.sizeX + x) * 4 + 1] = 208;
+    this.imgBufer[(y * this.sizeX + x) * 4 + 2] = 219;
+    this.imgBufer[(y * this.sizeX + x) * 4 + 3] = isClear ? 0 : 255;
   }
 
   changeStatusCell = (coords, isBuild = false) => {
@@ -74,6 +60,8 @@ class Game {
   init = () => {
     root.style.width = `${this.sizeX}px`;
     root.style.height = `${this.sizeY}px`;
+    canvasWrap.style.width = `${this.sizeX}px`;
+    canvasWrap.style.height = `${this.sizeY}px`;
     root.width = this.sizeX;
     root.height = this.sizeY;
     this.builder.init();
@@ -83,23 +71,22 @@ class Game {
   render = () => {
     this.imgData.data.set(this.imgBufer);
     context.putImageData(this.imgData, 0, 0);
+    if (!this.isPause) window.requestAnimationFrame(this.startLife);
   };
 
-  startLife = (status = true) => {
-    clearInterval(this.interval);
-    const startLoop = () => {
-      this.matrixBufer.fill(0);
-      this.imgBufer.fill(0);
-      for (let i = 0; i < this.matrixBufer.length; i += 1) {
-        const y = Math.floor(i / this.matrixX);
-        const x = i % this.matrixX;
+  startLife = () => {
+    this.matrixBufer.fill(0);
+    this.imgBufer.fill(0);
+    for (let i = 0; i < this.matrixBufer.length; i += 1) {
+      const y = Math.floor(i / this.matrixX);
+      const x = i % this.matrixX;
 
-        const up = (y === 0) ? this.lastCountY : (y - 1);
-        const right = (x === this.lastCountX) ? 0 : (x + 1);
-        const down = (y === this.lastCountY) ? 0 : (y + 1);
-        const left = (x === 0) ? this.lastCountX : (x - 1);
+      const up = (y === 0) ? this.lastCountY : (y - 1);
+      const right = (x === this.lastCountX) ? 0 : (x + 1);
+      const down = (y === this.lastCountY) ? 0 : (y + 1);
+      const left = (x === 0) ? this.lastCountX : (x - 1);
 
-        const countNeighbours = this.matrix[up * this.matrixX + left]
+      const countNeighbours = this.matrix[up * this.matrixX + left]
           + this.matrix[up * this.matrixX + x]
           + this.matrix[up * this.matrixX + right]
           + this.matrix[y * this.matrixX + left]
@@ -108,22 +95,16 @@ class Game {
           + this.matrix[down * this.matrixX + x]
           + this.matrix[down * this.matrixX + right];
 
-        if ((this.matrix[i] === 1 && (countNeighbours === 2 || countNeighbours === 3))
+      if ((this.matrix[i] === 1 && (countNeighbours === 2 || countNeighbours === 3))
           || (this.matrix[i] === 0 && countNeighbours === 3)) {
-          this.matrixBufer[i] = 1;
-          this.setPixel(x, y);
-        }
+        this.matrixBufer[i] = 1;
+        this.setPixel(x, y);
       }
-      this.matrix = this.matrixBufer.slice();
-      this.builder.updateMatrix(this.matrix);
-      this.render();
-    };
-
-    this.interval = setInterval(startLoop, 15);
-
-    if (!status) {
-      clearInterval(this.interval);
     }
+    this.matrix = new Uint8Array(this.matrixBufer);
+
+    this.builder.updateMatrix(this.matrix);
+    this.render();
   };
 
   addListeners = () => {
@@ -132,8 +113,8 @@ class Game {
     });
 
     start.addEventListener('click', () => {
-      this.startLife(this.isPause);
       this.isPause = !this.isPause;
+      this.startLife();
       if (this.isPause) {
         start.textContent = 'Start';
       } else {
@@ -145,25 +126,39 @@ class Game {
       this.matrix = getMatrix({ x: this.matrixX, y: this.matrixY });
       this.builder.updateMatrix(this.matrix);
       this.imgBufer = this.imgBufer.fill(0);
-      this.render();
+      if (this.isPause) this.render();
     });
 
     root.addEventListener('click', (e) => {
       let x = e.offsetX;
       let y = e.offsetY;
-      x = Math.floor(x / 2);
-      y = Math.floor(y / 2);
+      x = Math.floor(x);
+      y = Math.floor(y);
 
       if (this.isBuild) {
         const coords = this.builder.constructBuilding({ x, y });
         coords.forEach((el) => {
           this.changeStatusCell(el, true);
         });
-        this.render();
+        if (this.isPause) this.render();
       } else {
         this.changeStatusCell({ x, y });
-        this.render();
+        if (this.isPause) this.render();
       }
+    });
+
+    root.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      root.style = 'transform: matrix(2, 0, 0, 2, 0, 0)';
+    });
+
+    canvasWrap.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      let x = e.offsetX;
+      let y = e.offsetY;
+      x = Math.floor(x);
+      y = Math.floor(y);
+      root.style = `transform: matrix(2, 0, 0, 2, ${(x > this.matrixX / 2) ? -100 : 100}, ${(y > this.matrixY / 2) ? -100 : 100})`;
     });
 
     chooseBuild.addEventListener('click', () => {

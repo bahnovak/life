@@ -57,6 +57,7 @@ body {
 }
 
 #root {
+    transition: 1s;
     box-shadow: 0 0 5px 0 black;
     background-color: rgb(36,92,96);
     image-rendering: pixelated;
