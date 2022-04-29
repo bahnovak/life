@@ -169,6 +169,8 @@ class Game {
       root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, 0, 0)`;
     });
 
+    document.addEventListener('selectstart', (e) => e.preventDefault());
+
     canvasWrap.addEventListener('contextmenu', (e) => {
       if (this.zoom === 1) return;
       e.preventDefault();
@@ -176,11 +178,31 @@ class Game {
       let y = e.layerY;
       x = Math.floor(x);
       y = Math.floor(y);
-      root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
-        (x > this.matrixX / 2) ? this.moveX -= 100 : this.moveX += 100
-      }, ${
-        (y > this.matrixY / 2) ? this.moveY -= 100 : this.moveY += 100
-      })`;
+      if (x < this.matrixX / 4) {
+        root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
+          this.moveX += 100 * this.zoom
+        }, ${
+          this.moveY
+        })`;
+      } else if (x > this.matrixX * 0.75) {
+        root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
+          this.moveX -= 100 * this.zoom
+        }, ${
+          this.moveY
+        })`;
+      } else if (y < this.matrixY / 2) {
+        root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
+          this.moveX
+        }, ${
+          this.moveY += 100 * this.zoom
+        })`;
+      } else {
+        root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
+          this.moveX
+        }, ${
+          this.moveY -= 100 * this.zoom
+        })`;
+      }
     });
 
     chooseBuild.addEventListener('click', () => {
