@@ -13,6 +13,8 @@ const clear = document.querySelector('#clear');
 const chooseBuild = document.querySelector('#chooseBuild');
 const close = document.querySelector('#close');
 const checkbox = document.querySelector('#checkbox');
+const zoomIn = document.querySelector('#zoomIn');
+const zoomOut = document.querySelector('#zoomOut');
 
 const getMatrix = ({ x, y }) => new Uint8Array(x * y);
 
@@ -36,6 +38,9 @@ class Game {
     this.isPause = true;
     this.isBuild = false;
     this.builder = new Builder(this.matrix, this.matrixX, this.lastCountX, this.lastCountY);
+    this.zoom = 1;
+    this.moveX = 0;
+    this.moveY = 0;
   }
 
   setPixel(x, y, isClear) {
@@ -87,16 +92,16 @@ class Game {
       const left = (x === 0) ? this.lastCountX : (x - 1);
 
       const countNeighbours = this.matrix[up * this.matrixX + left]
-          + this.matrix[up * this.matrixX + x]
-          + this.matrix[up * this.matrixX + right]
-          + this.matrix[y * this.matrixX + left]
-          + this.matrix[y * this.matrixX + right]
-          + this.matrix[down * this.matrixX + left]
-          + this.matrix[down * this.matrixX + x]
-          + this.matrix[down * this.matrixX + right];
+        + this.matrix[up * this.matrixX + x]
+        + this.matrix[up * this.matrixX + right]
+        + this.matrix[y * this.matrixX + left]
+        + this.matrix[y * this.matrixX + right]
+        + this.matrix[down * this.matrixX + left]
+        + this.matrix[down * this.matrixX + x]
+        + this.matrix[down * this.matrixX + right];
 
       if ((this.matrix[i] === 1 && (countNeighbours === 2 || countNeighbours === 3))
-          || (this.matrix[i] === 0 && countNeighbours === 3)) {
+        || (this.matrix[i] === 0 && countNeighbours === 3)) {
         this.matrixBufer[i] = 1;
         this.setPixel(x, y);
       }
@@ -147,18 +152,35 @@ class Game {
       }
     });
 
-    root.addEventListener('contextmenu', (e) => {
+    zoomIn.addEventListener('click', (e) => {
       e.preventDefault();
-      root.style = 'transform: matrix(2, 0, 0, 2, 0, 0)';
+      this.zoom *= 2;
+      this.moveX = 0;
+      this.moveY = 0;
+      root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, 0, 0)`;
     });
 
-    canvasWrap.addEventListener('mousedown', (e) => {
+    zoomOut.addEventListener('click', (e) => {
+      if (this.zoom === 1) return;
       e.preventDefault();
-      let x = e.offsetX;
-      let y = e.offsetY;
+      this.zoom /= 2;
+      this.moveX = 0;
+      this.moveY = 0;
+      root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, 0, 0)`;
+    });
+
+    canvasWrap.addEventListener('contextmenu', (e) => {
+      if (this.zoom === 1) return;
+      e.preventDefault();
+      let x = e.layerX;
+      let y = e.layerY;
       x = Math.floor(x);
       y = Math.floor(y);
-      root.style = `transform: matrix(2, 0, 0, 2, ${(x > this.matrixX / 2) ? -100 : 100}, ${(y > this.matrixY / 2) ? -100 : 100})`;
+      root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
+        (x > this.matrixX / 2) ? this.moveX -= 100 : this.moveX += 100
+      }, ${
+        (y > this.matrixY / 2) ? this.moveY -= 100 : this.moveY += 100
+      })`;
     });
 
     chooseBuild.addEventListener('click', () => {
