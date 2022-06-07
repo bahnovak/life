@@ -11,18 +11,26 @@
     <span class="loader_info">Patterns initialization...</span>
 </div>
 <div id="controlPanel">
-    <button id="start">Start</button>
-    <button id="clear">Clear</button>
-    <label for="checkbox" class="checkbox-text">Construction mode</label>
-    <span id="checkbox"></span>
-    <button id="chooseBuild">Choose Build</button>
-    <span id="currentBuild"></span>
-    <button id="zoomIn">Zoom In</button>
-    <button id="zoomOut">Zoom Out</button>
+    <div id="start" class="controlItem">
+        <img src="./images/play.png" alt="">
+    </div>
+    <div id="clear" class="controlItem">
+        <img src="./images/clear.png" alt="">
+    </div>
 </div>
-
 <div class="canvasWrap">
     <canvas id="root"></canvas>
+</div>
+
+
+
+<div class="zoom">
+    <div id="zoomIn">+</div>
+    <div id="zoomOut">—</div>
+</div>
+
+<div id="chooseBuild" class="controlItem">
+    <img src="./images/build.png" alt="">
 </div>
 
 <div id="builds" class="d-none">
@@ -34,8 +42,16 @@
               <rect style="fill:none;fill-opacity:1;stroke:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" width="48" height="48" x="0" y="0"/>
             </g>
           </svg></span>
+    <div id="searchWrap">
+        <input type="text" id="input">
+        <button id="search">Search</button>
+    </div>
+
+    <div id="info">
+        <label for="checkbox" class="checkbox-text controlItem">Single dot</label>
+        <span id="checkbox" class="controlItem"></span>
+    </div>
     <div id="buildElements"></div>
 </div>
 </body>
 </html>
-

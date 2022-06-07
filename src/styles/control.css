@@ -1,0 +1,102 @@
+#controlPanel {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    position: fixed;
+    box-sizing: border-box;
+    top: 0;
+    left: 0;
+    padding: 30px;
+    overflow-x: auto;
+    z-index: 50;
+}
+
+.controlItem {
+    margin-right: 10px;
+}
+
+button {
+    min-width: 120px;
+    min-height: 35px;
+    transition: 0.3s;
+    font-family: 'Lato', sans-serif;
+    font-size: 20px;
+    border: none;
+    background-color: rgb(23, 57, 61);
+    color: rgb(232,237,233);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.zoom {
+    display: flex;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 35px;
+    height: 70px;
+    flex-wrap: wrap;
+    border-radius: 5px;
+    overflow: hidden;
+    z-index: 10;
+}
+
+#chooseBuild {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+}
+
+#zoomIn, #zoomOut {
+    font-size: 30px;
+    width: 35px;
+    height: 35px;
+    background-color: rgb(232,237,233);
+    display: flex;
+    cursor: pointer;
+    justify-content: center;
+}
+
+#zoomIn {
+    margin-bottom: 2px;
+}
+
+button:hover {
+    transition: 0.1s;
+    box-shadow: 0 0 3px 0 black;
+}
+
+button:active {
+    transition: 0.1s;
+    box-shadow:0 0 3px 0 black, inset 0 0 3px 0 white;
+}
+
+#checkbox {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    border: 1px solid rgb(232,237,233);
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.checkbox-text, #currentBuild {
+    font-size: 20px;
+    color: rgb(232,237,233);
+}
+
+.checkbox-text {
+    min-width: 100px;
+}
+
+.checkbox-active {
+    background-color: rgb(232,237,233);
+    border: none;
+}
+
+#start img, #clear img, #chooseBuild img{
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+}

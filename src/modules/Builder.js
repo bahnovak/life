@@ -3,8 +3,9 @@ import json from './constants';
 const constants = JSON.parse(json);
 
 const buildElements = document.querySelector('#buildElements');
-const currentBuild = document.querySelector('#currentBuild');
 const builds = document.querySelector('#builds');
+const input = document.querySelector('#input');
+const search = document.querySelector('#search');
 
 export default class Builder {
   constructor(matrix, matrixX, lastcountX, lastcountY) {
@@ -54,15 +55,25 @@ export default class Builder {
     div.textContent = constants[name].name;
     div.addEventListener('click', () => {
       this.name = name;
-      currentBuild.textContent = constants[name].name;
+      input.placeholder = constants[name].name;
       builds.classList.add('d-none');
+      input.value = '';
     });
 
     buildElements.append(div);
   };
 
   init = () => {
-    currentBuild.textContent = constants[this.name].name;
+    search.addEventListener('click', () => {
+      buildElements.innerHTML = '';
+
+      const temp = Object.keys(constants);
+      const filteredArray = temp.filter((el) => el.includes(input.value.toUpperCase()));
+      filteredArray.forEach((el) => {
+        this.buildElementsCreator(el);
+      });
+    });
+    input.placeholder = constants[this.name].name;
     Object.keys(constants).forEach((el) => {
       this.buildElementsCreator(el);
     });

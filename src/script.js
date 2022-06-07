@@ -1,12 +1,16 @@
 import './style.css';
 import Builder from './modules/Builder';
 
+window.addEventListener('orientationchange', () => {
+  document.location.reload();
+});
+
 const root = document.querySelector('#root');
-const canvasWrap = document.querySelector('.canvasWrap');
 const body = document.querySelector('body');
 const context = root.getContext('2d');
 const loader = document.querySelector('#loader');
 const builds = document.querySelector('#builds');
+const canvasWrap = document.querySelector('.canvasWrap');
 
 const start = document.querySelector('#start');
 const clear = document.querySelector('#clear');
@@ -15,12 +19,15 @@ const close = document.querySelector('#close');
 const checkbox = document.querySelector('#checkbox');
 const zoomIn = document.querySelector('#zoomIn');
 const zoomOut = document.querySelector('#zoomOut');
+const checkboxText = document.querySelector('.checkbox-text');
+const playImgElement = document.querySelector('#start img');
+const input = document.querySelector('#input');
 
 const getMatrix = ({ x, y }) => new Uint8Array(x * y);
 
 const getSize = () => ({
-  x: Math.floor((body.clientWidth - 60) / 40) * 40,
-  y: Math.floor((body.clientHeight - 60) / 40) * 40,
+  x: body.offsetWidth,
+  y: body.offsetHeight,
 });
 
 class Game {
@@ -36,7 +43,7 @@ class Game {
     this.imgData = context.createImageData(this.sizeX, this.sizeY);
     this.imgBufer = new Uint8ClampedArray(this.sizeX * this.sizeY * 4);
     this.isPause = true;
-    this.isBuild = false;
+    this.isBuild = true;
     this.builder = new Builder(this.matrix, this.matrixX, this.lastCountX, this.lastCountY);
     this.zoom = 1;
     this.moveX = 0;
@@ -65,10 +72,10 @@ class Game {
   init = () => {
     root.style.width = `${this.sizeX}px`;
     root.style.height = `${this.sizeY}px`;
-    canvasWrap.style.width = `${this.sizeX}px`;
-    canvasWrap.style.height = `${this.sizeY}px`;
     root.width = this.sizeX;
     root.height = this.sizeY;
+    canvasWrap.style.width = `${this.sizeX}px`;
+    canvasWrap.style.height = `${this.sizeY}px`;
     this.builder.init();
     loader.classList.add('v-hidden');
   };
@@ -115,15 +122,16 @@ class Game {
   addListeners = () => {
     close.addEventListener('click', () => {
       builds.classList.add('d-none');
+      input.value = '';
     });
 
     start.addEventListener('click', () => {
       this.isPause = !this.isPause;
       this.startLife();
       if (this.isPause) {
-        start.textContent = 'Start';
+        playImgElement.src = './images/play.png';
       } else {
-        start.textContent = 'Pause';
+        playImgElement.src = './images/pause.png';
       }
     });
 
@@ -161,9 +169,8 @@ class Game {
     });
 
     zoomOut.addEventListener('click', (e) => {
-      if (this.zoom === 1) return;
       e.preventDefault();
-      this.zoom /= 2;
+      this.zoom /= this.zoom === 1 ? 1 : 2;
       this.moveX = 0;
       this.moveY = 0;
       root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, 0, 0)`;
@@ -172,37 +179,77 @@ class Game {
     document.addEventListener('selectstart', (e) => e.preventDefault());
 
     canvasWrap.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    canvasWrap.addEventListener('mousedown', (e) => {
       if (this.zoom === 1) return;
       e.preventDefault();
-      let x = e.layerX;
-      let y = e.layerY;
-      x = Math.floor(x);
-      y = Math.floor(y);
-      if (x < this.matrixX / 4) {
-        root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
-          this.moveX += 100 * this.zoom
-        }, ${
-          this.moveY
-        })`;
-      } else if (x > this.matrixX * 0.75) {
-        root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
-          this.moveX -= 100 * this.zoom
-        }, ${
-          this.moveY
-        })`;
-      } else if (y < this.matrixY / 2) {
-        root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
-          this.moveX
-        }, ${
-          this.moveY += 100 * this.zoom
-        })`;
-      } else {
-        root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
-          this.moveX
-        }, ${
-          this.moveY -= 100 * this.zoom
-        })`;
+      if (e.button === 2) {
+        let centerX = e.layerX;
+        let centerY = e.layerY;
+        centerX = Math.floor(centerX);
+        centerY = Math.floor(centerY);
+
+        const shiftX = this.moveX;
+        const shiftY = this.moveY;
+
+        const handleMouseMove = (event) => {
+          let x = event.layerX;
+          let y = event.layerY;
+          x = Math.floor(x);
+          y = Math.floor(y);
+
+          root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
+
+            this.moveX = x - (centerX - shiftX)
+          }, ${
+            this.moveY = y - (centerY - shiftY)
+          })`;
+        };
+
+        canvasWrap.addEventListener('mousemove', handleMouseMove);
+
+        const handleMouseUp = () => {
+          canvasWrap.removeEventListener('mouseup', handleMouseUp);
+          canvasWrap.removeEventListener('mousemove', handleMouseMove);
+        };
+
+        canvasWrap.addEventListener('mouseup', handleMouseUp);
       }
+    });
+    canvasWrap.addEventListener('touchstart', (e) => {
+      if (this.zoom === 1) return;
+      let centerX = e.changedTouches[0].pageX;
+      let centerY = e.changedTouches[0].pageY;
+      centerX = Math.floor(centerX);
+      centerY = Math.floor(centerY);
+
+      const shiftX = this.moveX;
+      const shiftY = this.moveY;
+
+      const handleMouseMove = (event) => {
+        let x = event.changedTouches[0].pageX;
+        let y = event.changedTouches[0].pageY;
+        x = Math.floor(x);
+        y = Math.floor(y);
+
+        root.style = `transform: matrix(${this.zoom}, 0, 0, ${this.zoom}, ${
+          this.moveX = x - (centerX - shiftX)
+        }, ${
+          this.moveY = y - (centerY - shiftY)
+        })`;
+      };
+
+      canvasWrap.addEventListener('touchmove', handleMouseMove);
+
+      const handleMouseUp = () => {
+        e.preventDefault();
+        canvasWrap.removeEventListener('touchend', handleMouseUp);
+        canvasWrap.removeEventListener('touchmove', handleMouseMove);
+      };
+
+      canvasWrap.addEventListener('touchend', handleMouseUp);
     });
 
     chooseBuild.addEventListener('click', () => {
@@ -210,6 +257,12 @@ class Game {
     });
 
     checkbox.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.isBuild = !this.isBuild;
+      checkbox.classList.toggle('checkbox-active');
+    });
+
+    checkboxText.addEventListener('click', (e) => {
       e.preventDefault();
       this.isBuild = !this.isBuild;
       checkbox.classList.toggle('checkbox-active');
